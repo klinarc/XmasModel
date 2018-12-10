@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="im430.simpleblog.dao.mybatis.MappedSqlSessionChildDAOImpl">
+
+	<insert id="addChild" parameterType="Child"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into child(name, address_id)
+		values (#{name}, #{address.id})
+	</insert>
+
+	<update id="updateChild" parameterType="Child">
+		update child
+		set name=#{name}, address_id=#{address.id} where id=#{id}
+	</update>
+
+	<delete id="removeChild" parameterType="Child">
+		delete from
+		child where id=#{id}
+	</delete>
+
+	<select id="getAllChildren" resultMap="childResult">
+		select id, name, address_id from child order by name
+	</select>
+
+	<select id="getChildById" resultMap="childResult"
+		parameterType="int">
+		select id, name, address_id from child where id=#{id}
+	</select>
+	
+	<insert id="addGift" parameterType="java.util.Map"
+	  useGeneratedKeys="true" keyProperty="gift.id">
+		insert into gift(description, child_id) 
+		            values(#{gift.description}, #{childId})
+	</insert>
+	
+	<delete id="removeGift" parameterType="Gift">
+		delete from gift where id=#{id}
+	</delete>
+	
+	<resultMap id="childResult" type="Child">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<association property="address" javaType="Address"
+		select="im430.simpleblog.dao.mybatis.MappedSqlSessionAddressDAOImpl.getAddressById"
+		column="address_id" />
+		<collection property="gifts" javaType="ArrayList" ofType="Gift"
+			select="getGifts" column="id" />
+	</resultMap>
+	
+	<select id="getGifts" resultType="Gift" parameterType="int">
+		select id, description from gift where child_id=#{value}
+	</select>
+	
+	<select id="joinedGetAllChildren" resultMap="joinedChildResult">
+		select c.id as c_id, c.name as c_name, c.address_id, 
+		a.text,
+		g.id as g_id, g.description as g_description 
+		from child c 
+		left join address a on g.address_id = a.id
+		left join gift g on c.id = g.child_id
+		order by name
+	</select>
+
+	<select id="joinedGetChildById" resultMap="joinedChildResult"
+		parameterType="int">
+		select c.id as c_id, c.name as c_name, c.address_id, 
+		a.text,
+		g.id as g_id, g.description as g_description 
+		from child c 
+		left join address a on c.address_id = a.id
+		left join gift g on c.id = g.child_id
+		where c.id=#{id}
+	</select>
+	
+	<resultMap id="joinedChildResult" type="Child">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<association property="address" javaType="Address">
+			<id property="id" column="address_id" />
+			<result property="text" column="text" />
+		</association>
+		<collection property="gifts" javaType="ArrayList" ofType="Gift">
+			<id property="id" column="g_id"/>
+			<result property="description" column="g_description" />
+		</collection>
+	</resultMap>
+	
+
+</mapper> 

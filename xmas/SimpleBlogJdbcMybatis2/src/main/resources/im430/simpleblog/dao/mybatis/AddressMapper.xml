@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="im430.simpleblog.dao.mybatis.MappedSqlSessionAddressDAOImpl">
+
+	<insert id="addAddress" parameterType="Address"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into address(text) values(#{text})
+	</insert>
+
+	<delete id="removeAddress" parameterType="Address">
+		delete from address where id=#{id}
+	</delete>
+
+	<select id="getAllAddresses" resultType="Address">
+		select id, text from address order by text
+	</select>
+
+	<select id="getAddressById" resultType="Address"
+		parameterType="int">
+		select id, text from address where id=#{id}
+	</select>
+
+</mapper> 
